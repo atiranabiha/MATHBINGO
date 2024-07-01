@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ranking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffe0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 1000px;
+            height: 500px;
+            background-color: #333;
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+		
+        .screen {
+            width: calc(100% - 40px);
+            height: calc(100% - 80px);
+            background-color: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            position: absolute;
+            top: 40px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+			overflow-y: auto; /* Added to enable vertical scrolling */
+		}
+		
+		/* Hide scrollbar */
+        .screen::-webkit-scrollbar {
+            width: 0px; /* Remove scrollbar width */
+            background: transparent; /* Optional: Set a background color */
+        }
+
+		.header {
+            width: 100%;
+            display: flex;
+            justify-content: flex-start;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+		.header:hover {
+			opacity: 0.8; /* Reduce opacity on hover */
+        }
+
+        .header a {
+            padding: 10px 40px;
+            background-image: url('images/wood.png'); /* Add the path to your wood texture image */
+            background-size: cover;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+			opacity: 0.8; /* Reduce opacity on hover */
+        }
+
+        .ranking {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .ranking h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .selected-avatar {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .selected-avatar img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+        }
+
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .ranking-table th, .ranking-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .ranking-table th {
+            background-color: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <audio id="themeSong" autoplay loop>
+        <source src="./sounds/theme.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <div class="container">
+	    <div class="screen">
+			<div class="header">
+				<a href="index.html">Home</a>
+				<!-- Optional Clear Ranking button, uncomment if needed -->
+				<!-- <a href="#" id="clearRanking">Clear Ranking</a> -->
+			</div>
+			<div class="ranking">
+				<h2>Ranking</h2>
+				<div class="selected-avatar" id="selectedAvatar">
+					<!-- Selected avatar and user name will be displayed here -->
+				</div>
+				<table class="ranking-table">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th>Time</th>
+						</tr>
+					</thead>
+					<tbody id="rankingList">
+						<!-- Ranking table rows will be added dynamically -->
+					</tbody>
+				</table>
+			</div>
+		</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Retrieve stored user name and selected avatar
+            const userName = localStorage.getItem('userName');
+            const selectedAvatar = localStorage.getItem('selectedAvatar');
+            const selectedAvatarDiv = document.getElementById('selectedAvatar');
+
+            if (userName && selectedAvatar) {
+                selectedAvatarDiv.innerHTML = `
+                    <img src="${selectedAvatar}" alt="Selected Avatar">
+                    <p>User: ${userName}</p>
+                `;
+            } else {
+                selectedAvatarDiv.innerHTML = "<p>No user data available</p>";
+            }
+
+            // Retrieve and display the ranking list
+            const rankingList = JSON.parse(localStorage.getItem('ranking')) || [];
+            const rankingListContainer = document.getElementById('rankingList');
+			
+            rankingList.sort((a, b) => {
+                const timeToSeconds = time => {
+                    const [minutes, seconds] = time.split(':').map(Number);
+                    return minutes * 60 + seconds;
+                };
+
+                return timeToSeconds(a.time) - timeToSeconds(b.time);
+            });
+            
+			rankingList.forEach(function(rank) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${rank.name}</td><td>${rank.time}</td>`;
+                rankingListContainer.appendChild(row);
+            });
+
+            // Event listener for clearing ranking (uncomment if needed)
+            // const clearRankingButton = document.getElementById('clearRanking');
+            // clearRankingButton.addEventListener('click', function(event) {
+            //     event.preventDefault();
+            //     localStorage.removeItem('ranking'); // Clear ranking data from localStorage
+            //     rankingListContainer.innerHTML = ''; // Clear UI ranking list
+            // });
+        });
+
+        function retrieveAudioState() {
+            const themeSong = document.getElementById('themeSong');
+            const themeSongTime = localStorage.getItem('themeSongTime');
+            const themeSongPlaying = localStorage.getItem('themeSongPlaying') === 'true';
+
+            if (themeSongTime !== null) {
+                themeSong.currentTime = parseFloat(themeSongTime);
+            }
+            if (themeSongPlaying) {
+                themeSong.play();
+            }
+        }
+
+        window.onload = retrieveAudioState;
+    </script>
+</body>
+</html>

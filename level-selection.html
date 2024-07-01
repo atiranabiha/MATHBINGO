@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Level</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffe0; /* Background color for the entire page */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .phone {
+            width: 500px; /* Adjust the width of the phone frame */
+            height: 1000px; /* Adjust the height of the phone frame */
+            background-color: #333; /* Phone frame color */
+            border-radius: 30px; /* Rounded corners for the phone frame */
+            overflow: hidden; /* Hide overflow content */
+            position: relative; /* Positioning context */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); /* Shadow for the phone frame */
+            transform: rotate(90deg); /* Rotate the phone frame by 90 degrees */
+            transform-origin: center; /* Rotate from the center */
+        }
+
+        .bezel {
+            width: calc(100% - 40px);
+            height: calc(100% - 80px);
+            background-color: #ccc; /* Bezel color */
+            position: absolute;
+            top: 40px;
+            left: 20px;
+            border-radius: 20px; /* Rounded corners for the bezel */
+            overflow: hidden; /* Hide overflow content */
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background-color: #fff; /* Screen background color */
+            border-radius: 20px; /* Rounded corners for the screen */
+            overflow: hidden; /* Hide overflowing content */
+            position: relative; /* Positioning context */
+        }
+
+        .container {
+            text-align: center;
+            padding: 30px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-90deg); /* Rotate content back to horizontal */
+            color: #333; /* Text color matching the bezel */
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+		.title {
+			font-size: 36px; /* Font size for the title */
+			font-weight: bold; /* Make the text thicker */
+			text-shadow: -1px -1px 0 #fff,  
+						 1px -1px 0 #fff,
+						-1px  1px 0 #fff,
+						 1px  1px 0 #fff; /* White stroke around text */
+			margin-bottom: 20px;
+		}
+
+		.welcome-message {
+			font-weight: bold; /* Make the welcome message text thicker */
+			text-shadow: -1px -1px 0 #fff,  
+						 1px -1px 0 #fff,
+						-1px  1px 0 #fff,
+						 1px  1px 0 #fff; /* White stroke around text */
+		}
+
+        .welcome-message {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .level-selection {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: px;
+        }
+
+        .level-box {
+            border: none;
+            border-radius: none;
+            padding: 0px;
+            margin-bottom: 20px;
+        }
+
+        .level-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .level-row button {
+            margin: 10px;
+            padding: 15px 30px;
+            background: url('images/wood.png') no-repeat center center;
+            color: #fff; /* Button text color */
+            font-size: 24px; /* Button text size */
+            border: none;
+            border-radius: 8px; /* Button border radius */
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .level-row button:hover {
+			opacity: 0.8; /* Reduce opacity on hover */
+        }
+
+        .button {
+            display: inline-block;
+            padding: 25px 100px;
+            background: url('images/wood.png') no-repeat center center;
+            color: #fff; /* Button text color */
+            font-size: 24px; /* Button text size */
+            border: none;
+            border-radius: 8px; /* Button border radius */
+            cursor: pointer;
+            text-decoration: none;
+            margin: 15px;
+            transition: background-color 0.3s ease;
+            transform: rotate(-90deg);
+			display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .home-button {
+            position: absolute;
+            bottom: 285px; /* Adjust bottom position */
+            left: -165px; /* Adjust left position */
+            transform: translate(-50%, -50%) rotate(0deg); /* Adjust rotation and positioning */
+        }
+
+        .ranking-button {
+            position: absolute;
+            top: 25px; /* Adjust top position */
+            right: -165px; /* Adjust right position */
+            transform: translate(50%, -50%) rotate(0deg); /* Adjust rotation and positioning */
+        }
+
+        .avatar-button {
+            position: absolute;
+            top: 365px; /* Adjust top position */
+            left: -165px; /* Adjust left position */
+            transform: translate(-50%, -50%) rotate(0deg); /* Adjust rotation and positioning */
+        }
+    </style>
+</head>
+<body>
+    <audio id="themeSong" autoplay loop>
+        <source src="./sounds/theme.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <div class="phone">
+        <div class="bezel">
+            <div class="screen">
+				<img src="images/img3.jpg" alt="Background" style="position: absolute; top: 80px; right: -275px;transform: rotate(90deg);">
+                <div class="container">
+                    <h1 class="title">Choose Level</h1>
+                    <div id="welcomeMessage" class="welcome-message"></div>
+                    <div class="level-selection">
+                        <div class="level-box">
+                            <div class="level-row">
+                                <button id="level1" data-level="1">Level 1</button>
+                                <button id="level2" data-level="2">Level 2</button>
+                            </div>
+                            <div class="level-row">
+                                <button id="level3" data-level="3">Level 3</button>
+                                <button id="level4" data-level="4">Level 4</button>
+                            </div>
+                        </div>
+                    </div>
+                    <a id="rankingButton" class="button ranking-button">Ranking</a>
+                    <a id="homeButton" class="button home-button">Home</a>
+                    <a id="avatarButton" class="button avatar-button">Avatar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const userName = urlParams.get('user_name');
+
+            if (userName) {
+                document.getElementById('welcomeMessage').innerText = `Welcome, ${userName}!`;
+            }
+
+            document.getElementById('level1').addEventListener('click', () => {
+                window.location.href = `game.html?user_name=${encodeURIComponent(userName)}&level=1`;
+            });
+            document.getElementById('level2').addEventListener('click', () => {
+                window.location.href = `game.html?user_name=${encodeURIComponent(userName)}&level=2`;
+            });
+            document.getElementById('level3').addEventListener('click', () => {
+                window.location.href = `game.html?user_name=${encodeURIComponent(userName)}&level=3`;
+            });
+            document.getElementById('level4').addEventListener('click', () => {
+                window.location.href = `game.html?user_name=${encodeURIComponent(userName)}&level=4`;
+            });
+
+            document.getElementById('rankingButton').addEventListener('click', function() {
+                window.location.href = `ranking.html?user_name=${encodeURIComponent(userName)}`;
+            });
+
+            document.getElementById('homeButton').addEventListener('click', function() {
+                window.location.href = `index.html?user_name=${encodeURIComponent(userName)}`;
+            });
+
+            document.getElementById('avatarButton').addEventListener('click', () => {
+                window.location.href = `select-avatar.html?user_name=${encodeURIComponent(userName)}`;
+            });
+
+        });
+
+        function retrieveAudioState() {
+            const themeSong = document.getElementById('themeSong');
+            const themeSongTime = localStorage.getItem('themeSongTime');
+            const themeSongPlaying = localStorage.getItem('themeSongPlaying') === 'true';
+
+            if (themeSongTime !== null) {
+                themeSong.currentTime = parseFloat(themeSongTime);
+            }
+            if (themeSongPlaying) {
+                themeSong.play();
+            }
+        }
+
+        window.onload = retrieveAudioState;
+    </script>
+</body>
+</html>

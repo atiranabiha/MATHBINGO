@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MATHBINGO</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffe0; /* Background color for the entire page */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .phone {
+            width: 500px; /* Adjust the width of the phone frame */
+            height: 1000px; /* Adjust the height of the phone frame */
+            background-color: #333; /* Phone frame color */
+            border-radius: 30px; /* Rounded corners for the phone frame */
+            overflow: hidden; /* Hide overflow content */
+            position: relative; /* Positioning context */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); /* Shadow for the phone frame */
+            transform: rotate(90deg); /* Rotate the phone frame by 90 degrees */
+            transform-origin: center; /* Rotate from the center */
+        }
+
+        .bezel {
+            width: calc(100% - 40px);
+            height: calc(100% - 80px);
+            background-color: #ccc; /* Bezel color */
+            position: absolute;
+            top: 40px;
+            left: 20px;
+            border-radius: 20px; /* Rounded corners for the bezel */
+            overflow: hidden; /* Hide overflow content */
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background-color: #fff; /* Screen background color */
+            border-radius: 20px; /* Rounded corners for the screen */
+            overflow: hidden; /* Hide overflowing content */
+            position: relative; /* Positioning context */
+        }
+
+        .container {
+            text-align: center;
+            padding: 30px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-90deg); /* Rotate content back to horizontal */
+            color: #333; /* Text color matching the bezel */
+        }
+
+		h1 {
+			font-size: 80px; /* Increase font size */
+			margin-bottom: 20px;
+			font-family: 'Arial Black', sans-serif; /* Change font family */
+			margin: 0; /* Remove default margin */
+			letter-spacing: 2px; /* Add letter spacing */
+			-webkit-text-stroke: 2px white; /* White stroke around text */
+			background: linear-gradient(to right, #ffcc66, #ff6666); /* Gradient background color (more pronounced soft orange to red) */
+			-webkit-background-clip: text; /* Clip the background to text */
+			-webkit-text-fill-color: transparent; /* Make the text transparent */
+		}
+
+        .wood-button {
+            display: inline-block;
+            padding: 0px;
+            background: url('images/wood.png') no-repeat center center;
+            width: 1000px; /* Width of the wood button */
+            height: 100px; /* Height of the wood button */
+            color: #fff; /* Button text color */
+            font-size: 24px; /* Button text size */
+            border: none;
+            border-radius: 8px; /* Button border radius */
+            cursor: pointer;
+            text-decoration: none;
+            margin: 15px;
+            transition: background-color 0.3s ease; /* Smooth hover effect */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .wood-button:hover {
+            opacity: 0.8; /* Reduce opacity on hover */
+        }
+
+        .info-button {
+            position: absolute;
+            bottom: 880px;
+            left: 400px;
+            font-size: 24px;
+            color: #666;
+            text-decoration: none;
+            transform: rotate(270deg);
+            transition: transform 0.3s ease;
+            width: 50px; /* Width of the circle */
+            height: 50px; /* Height of the circle */
+            border-radius: 50%; /* Make it a circle */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ccc; /* Circle background color */
+        }
+
+        .info-button:hover {
+            color: #333;
+        }
+
+        .info-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 400px;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #000;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 2;
+            display: none; /* Initially hidden */
+            text-align: left; /* Align text to the left */
+            font-family: 'Comic Sans MS', sans-serif; /* Matching the handwriting style */
+            overflow-y: auto; /* Add vertical scroll if content overflows */
+        }
+
+        .info-popup h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .info-popup p {
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .info-popup .instruction {
+            font-size: 16px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            color: #000;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .close-button {
+            display: block;
+            margin: 0 auto;
+            padding: 0px;
+            background: url('images/wood.png') no-repeat center center;
+			width: 250px; /* Width of the wood button */
+            height: 90px; /* Height of the wood button */
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Remove default link styles */
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+</head>
+<body>
+    <audio id="themeSong" autoplay loop>
+        <source src="./sounds/theme.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <div class="phone">
+        <div class="bezel">
+            <div class="screen">
+				<img src="images/Ghibli.gif" alt="Homepage" style="position: absolute; top: -75px; right: -500px; transform: rotate(90deg);">
+                <div class="container">
+                    <h1>MATHBINGO</h1>
+                    <a href="enter-name.html" class="wood-button">START NEW GAME</a>
+                    <a href="login.html" class="wood-button">CONTINUE GAME</a>
+                </div>
+            </div>
+        </div>
+        <a href="#" class="info-button" id="info">i</a>
+    </div>
+
+    <div class="info-popup" id="info-popup">
+        <div class="instruction">
+            <p><strong>1.</strong> Select the level of math skills you like.</p>
+            <ul>
+                <li>LVL 1 = (+)</li>
+                <li>LVL 2 = (+)(-)</li>
+                <li>LVL 3 = (+)(-)(×)</li>
+                <li>LVL 4 = (+)(-)(×)(÷)</li>
+            </ul>
+        </div>
+        <div class="instruction">
+            <p><strong>2.</strong> Answer the question.</p>
+        </div>
+        <div class="instruction">
+            <p><strong>3.</strong> Sometimes, there are multiple correct answers to choose from. So, choose the most strategic in helping you win.</p>
+        </div>
+        <div class="instruction">
+            <p><strong>4.</strong> You can get BINGO by marking 5 answers in a row, horizontally or diagonally.</p>
+        </div>
+        <button class="close-button" onclick="closeInfoPopup()">Close</button>
+    </div>
+
+    <script>
+        document.getElementById('info').addEventListener('click', function(event) {
+            event.preventDefault(); // Prevent default anchor behavior
+            document.getElementById('info-popup').style.display = 'block'; // Display info popup
+        });
+
+        function closeInfoPopup() {
+            document.getElementById('info-popup').style.display = 'none'; // Hide info popup
+        }
+
+        function storeAudioState() {
+            const themeSong = document.getElementById('themeSong');
+            localStorage.setItem('themeSongTime', themeSong.currentTime);
+            localStorage.setItem('themeSongPlaying', !themeSong.paused);
+        }
+
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', storeAudioState);
+        });
+
+        function retrieveAudioState() {
+            const themeSong = document.getElementById('themeSong');
+            const themeSongTime = localStorage.getItem('themeSongTime');
+            const themeSongPlaying = localStorage.getItem('themeSongPlaying') === 'true';
+
+            if (themeSongTime !== null) {
+                themeSong.currentTime = parseFloat(themeSongTime);
+            }
+            if (themeSongPlaying) {
+                themeSong.play();
+            }
+        }
+
+        window.onload = retrieveAudioState;
+
+    </script>
+</body>
+</html>

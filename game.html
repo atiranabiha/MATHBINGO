@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffe0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .phone {
+            width: 1000px;
+            height: 500px;
+            background-color: #333;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .screen {
+            width: calc(100% - 40px);
+            height: calc(100% - 80px);
+            background-color: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            position: absolute;
+            top: 40px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: #ADD8E6;
+            box-sizing: border-box;
+        }
+
+        .header a {
+            padding: 10px 40px;
+            background-image: url('images/wood.png'); /* Add the path to your wood texture image */
+            background-size: cover;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        } 
+		
+		.header div {
+            padding: 10px 55px;
+            background-image: url('images/wood.png'); /* Add the path to your wood texture image */
+            background-size: cover;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 18px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .question-timer {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            width: 20%;
+            height: 100%;
+            margin-right: 20px;
+        }
+
+        .question-timer div {
+            padding: 10px 20px;
+            background-color: #eee;
+            border-radius: 8px;
+            font-size: 24px;
+            margin-bottom: 20px;
+            width: 85%;
+            text-align: center;
+        }
+
+        .bingo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80%;
+        }
+
+        .bingo-header {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .bingo-board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .bingo-board div {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            height: 50px;
+            background-color: #ccc;
+            border-radius: 8px;
+            border: 1px solid #999;
+            cursor: pointer;
+        }
+
+        .bingo-board div.covered {
+            background-color: #4CAF50;
+            color: #fff;
+        }
+
+        .pause-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <audio id="themeSong" autoplay loop>
+        <source src="./sounds/theme.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <div class="phone">
+        <div class="screen">
+            <div class="header">
+                <a href="index.html">Home</a>
+                <div id="pauseGame">II</div> <!-- Pause button -->
+            </div>
+            <div class="content">
+                <div class="question-timer">
+                    <div id="question">QUESTION</div>
+                    <div id="stopwatch">00:00</div>
+                </div>
+                <div class="bingo-container">
+                    <div class="bingo-header">
+                        <div>B</div>
+                        <div>I</div>
+                        <div>N</div>
+                        <div>G</div>
+                        <div>O</div>
+                    </div>
+                    <div class="bingo-board" id="bingoBoard">
+                        <!-- Bingo board will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="pause-message" id="pauseMessage">Game paused.</div> <!-- Pause message -->
+    </div>
+	
+	<audio id="wrongAnswerSound" src="./sounds/wrong-sound.mp3" preload="auto"></audio> <!-- Audio element -->
+    <audio id="correctAnswerSound" src="./sounds/correct-sound.mp3" preload="auto"></audio> <!-- Audio element -->
+
+  <script>
+        let coveredSquares = Array(5).fill().map(() => Array(5).fill(false));
+        let bingoBoardDivs;
+        let timerInterval;
+        let currentQuestion;
+        let currentAnswer;
+        let isPaused = false;
+        let hasPausedOnce = false;
+        let usedNumbers = [];
+        let boardNumbers;
+        let elapsedTime = 0; // Store elapsed time in seconds
+
+        const level = parseInt(new URLSearchParams(window.location.search).get('level')) || 1;
+
+        function getRandomInt(max) {
+            return Math.floor(Math.random() * max) + 1;
+        }
+
+        function generateQuestion() {
+            let num1, num2, operator;
+            const operators = ['+'];
+
+            if (level >= 2) operators.push('-');
+            if (level >= 3) operators.push('*');
+            if (level >= 4) operators.push('/');
+
+            // Ensure unique current answer
+            do {
+                currentAnswer = boardNumbers[Math.floor(Math.random() * boardNumbers.length)];
+            } while (usedNumbers.includes(currentAnswer));
+            usedNumbers.push(currentAnswer);
+
+            do {
+                num1 = getRandomInt(50);
+                num2 = getRandomInt(50);
+                operator = operators[Math.floor(Math.random() * operators.length)];
+
+                // Ensure num2 is not zero for division and the result is an integer
+                if (operator === '/' && (num2 === 0 || num1 % num2 !== 0)) {
+                    continue;
+                }
+
+                // Set conditions for valid operations
+                if (operator === '+') currentQuestion = `${num1} + ${num2}`;
+                if (operator === '-') currentQuestion = `${num1} - ${num2}`;
+                if (operator === '*') currentQuestion = `${num1} * ${num2}`;
+                if (operator === '/') currentQuestion = `${num1} / ${num2}`;
+
+            } while ((operator === '+' && num1 + num2 !== currentAnswer) ||
+                     (operator === '-' && num1 - num2 !== currentAnswer) ||
+                     (operator === '*' && num1 * num2 !== currentAnswer) ||
+                     (operator === '/' && num1 / num2 !== currentAnswer));
+
+            return currentQuestion;
+        }
+
+        function checkBingo() {
+    // Check rows and columns
+    for (let i = 0; i < 5; i++) {
+        if (coveredSquares[i].every(val => val)) {
+            clearInterval(timerInterval);
+            const playerName = localStorage.getItem('userName');
+            const time = document.getElementById('stopwatch').innerText;
+
+            let ranking = JSON.parse(localStorage.getItem('ranking')) || [];
+            ranking.push({ name: playerName, time: time });
+            localStorage.setItem('ranking', JSON.stringify(ranking));
+
+            // Replace alert with your custom message or redirect logic
+            // alert('Bingo! Game over.');
+            window.location.href = 'ranking.html';
+            return true;
+        }
+        if (coveredSquares.map(row => row[i]).every(val => val)) {
+            clearInterval(timerInterval);
+            const playerName = localStorage.getItem('userName');
+            const time = document.getElementById('stopwatch').innerText;
+
+            let ranking = JSON.parse(localStorage.getItem('ranking')) || [];
+            ranking.push({ name: playerName, time: time });
+            localStorage.setItem('ranking', JSON.stringify(ranking));
+
+            // Replace alert with your custom message or redirect logic
+            // alert('Bingo! Game over.');
+            window.location.href = 'ranking.html';
+            return true;
+        }
+    }
+
+    // Check diagonals
+    if (coveredSquares.every((row, i) => row[i])) {
+        clearInterval(timerInterval);
+        const playerName = localStorage.getItem('userName');
+        const time = document.getElementById('stopwatch').innerText;
+
+        let ranking = JSON.parse(localStorage.getItem('ranking')) || [];
+        ranking.push({ name: playerName, time: time });
+        localStorage.setItem('ranking', JSON.stringify(ranking));
+
+        // Replace alert with your custom message or redirect logic
+        // alert('Bingo! Game over.');
+        window.location.href = 'ranking.html';
+        return true;
+    }
+    if (coveredSquares.every((row, i) => row[4 - i])) {
+        clearInterval(timerInterval);
+        const playerName = localStorage.getItem('userName');
+        const time = document.getElementById('stopwatch').innerText;
+
+        let ranking = JSON.parse(localStorage.getItem('ranking')) || [];
+        ranking.push({ name: playerName, time: time });
+        localStorage.setItem('ranking', JSON.stringify(ranking));
+
+        // Replace alert with your custom message or redirect logic
+        // alert('Bingo! Game over.');
+        window.location.href = 'ranking.html';
+        return true;
+    }
+
+    return false;
+    }
+
+    function startStopwatch() {
+            timerInterval = setInterval(() => {
+                if (!isPaused) {
+                    elapsedTime++;
+
+                    const minutes = Math.floor(elapsedTime / 60);
+                    const seconds = elapsedTime % 60;
+
+                    const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+                    const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+
+                    document.getElementById('stopwatch').innerText = `${formattedMinutes}:${formattedSeconds}`;
+                }
+            }, 1000);
+        }
+
+        function addPenalty() {
+            elapsedTime += 15;
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+
+            const formattedMinutes = minutes < 10 ? `0${minutes}` : minutes;
+            const formattedSeconds = seconds < 10 ? `0${seconds}` : seconds;
+
+            document.getElementById('stopwatch').innerText = `${formattedMinutes}:${formattedSeconds}`;
+        }
+
+        function setupGame() {
+            // Generate a unique set of random numbers for the bingo board
+            const numbers = Array.from({ length: 75 }, (_, i) => i + 1);
+            shuffleArray(numbers);
+            boardNumbers = numbers.slice(0, 25);
+
+            // Display the bingo board
+            const bingoBoard = document.getElementById('bingoBoard');
+            boardNumbers.forEach(number => {
+                const div = document.createElement('div');
+                div.textContent = number;
+                bingoBoard.appendChild(div);
+            });
+
+            bingoBoardDivs = Array.from(document.getElementById('bingoBoard').children);
+            document.getElementById('question').innerText = generateQuestion();
+
+            bingoBoardDivs.forEach((div, index) => {
+                div.addEventListener('click', () => {
+                    const answer = parseInt(div.innerText, 10);
+                    if (answer === currentAnswer) {
+                        div.classList.add('covered');
+                        coveredSquares[Math.floor(index / 5)][index % 5] = true;
+                        document.getElementById('correctAnswerSound').play();  // Play sound
+
+                        document.getElementById('question').innerText = generateQuestion();
+
+
+                        if (checkBingo()) {
+                            clearInterval(timerInterval);
+                            // Replace alert with your custom message or redirect logic
+                            // alert('Bingo! Game over.');
+                            window.location.href = 'ranking.html';
+                            
+                        }
+                    } else {
+                        addPenalty();  // Penalty is added here if the answer is wrong
+                        document.getElementById('wrongAnswerSound').play();  // Play sound
+                    }
+                });
+            });
+
+            document.getElementById('pauseGame').addEventListener('click', () => {
+                isPaused = !isPaused;
+                if (isPaused) {
+                    document.getElementById('pauseMessage').style.display = 'block';
+                    if (!hasPausedOnce) {
+                        addPenalty();
+                        hasPausedOnce = true;
+                    }
+                } else {
+                    document.getElementById('pauseMessage').style.display = 'none';
+                }
+            });
+
+            startStopwatch();
+        }
+        function retrieveAudioState() {
+            const themeSong = document.getElementById('themeSong');
+            const themeSongTime = localStorage.getItem('themeSongTime');
+            const themeSongPlaying = localStorage.getItem('themeSongPlaying') === 'true';
+
+            if (themeSongTime !== null) {
+                themeSong.currentTime = parseFloat(themeSongTime);
+            }
+            if (themeSongPlaying) {
+                themeSong.play();
+            }
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        window.onload = () => {
+            retrieveAudioState();
+            setupGame();
+        
+        
+        };
+    </script>
+</body>
+</html>
+

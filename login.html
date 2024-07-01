@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffe0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            position: relative;
+        }
+
+        .phone {
+            width: 500px;
+            height: 1000px;
+            background-color: #333;
+            border-radius: 30px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            transform: rotate(90deg);
+            transform-origin: center;
+        }
+
+        .bezel {
+            width: calc(100% - 40px);
+            height: calc(100% - 80px);
+            background-color: #ccc;
+            position: absolute;
+            top: 40px;
+            left: 20px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .container {
+            text-align: center;
+            padding: 30px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-90deg);
+            color: #333;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+		.input-group label {
+			font-size: 34px;
+			font-weight: bold; /* Make the text thicker */
+			margin-bottom: 15px;
+			text-shadow: -1px -1px 0 #fff,  
+						 1px -1px 0 #fff,
+						-1px  1px 0 #fff,
+						 1px  1px 0 #fff;
+			color: #000; /* Ensure text color is black */
+		}
+
+        .input-group input {
+            width: 400px;
+            padding: 20px;
+            font-size: 40px;
+            border: 5px solid #ccc;
+            border-radius: 10px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 25px 100px;
+            background: url('images/wood.png') no-repeat center center;
+            color: #fff; /* Button text color */
+            font-size: 24px; /* Button text size */
+            border: none;
+            border-radius: 8px; /* Button border radius */
+            cursor: pointer;
+            text-decoration: none;
+            margin: 15px;
+            transition: background-color 0.3s ease;
+            transform: rotate(-90deg);
+			display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+		
+		.button:hover {
+			opacity: 0.8; /* Reduce opacity on hover */
+        }
+
+        .home-button {
+            position: absolute;
+            bottom: 85px;
+            left: -90px;
+        }
+
+        .enter-button {
+            position: absolute;
+            top: 85px;
+            right: -90px;
+		}
+
+        .popup {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            z-index: 1000;
+        }
+
+        .popup button {
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .popup button:hover {
+            background-color: #3e8e41;
+        }
+    </style>
+</head>
+<body>
+    <audio id="themeSong" autoplay loop>
+        <source src="./sounds/theme.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+    <div class="phone">
+        <div class="bezel">
+            <div class="screen">
+				<img src="images/img3.jpg" alt="Background" style="position: absolute; top: 80px; right: -275px;transform: rotate(90deg);">
+                <div class="container">
+                    <div class="input-group">
+                        <label for="playerName">Enter Your Name:</label>
+                        <input type="text" id="playerName" required>
+                    </div>
+                </div>
+                <button type="button" class="button enter-button" id="enterName">Login</button>
+                <a href="index.html" class="button home-button">Home</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup" id="popup">
+        <p id="popupMessage">Please enter your name.</p>
+        <button id="closePopup">Close</button>
+    </div>
+
+    <script>
+        document.getElementById('enterName').addEventListener('click', function(event) {
+            var playerName = document.getElementById('playerName').value.trim();
+            if (playerName === "") {
+                event.preventDefault();
+                document.getElementById('popupMessage').textContent = "Please enter your name.";
+                document.getElementById('popup').style.display = 'block';
+            } else {
+                // Retrieve users from localStorage
+                var users = JSON.parse(localStorage.getItem('users')) || [];
+                var userExists = users.some(user => user.name === playerName);
+
+                if (!userExists) {
+                    event.preventDefault();
+                    document.getElementById('popupMessage').textContent = "User not found. Please register first.";
+                    document.getElementById('popup').style.display = 'block';
+                } else {
+                    // Store user name in localStorage
+                    localStorage.setItem('userName', playerName);
+                    // Redirect to the level selection page
+                    window.location.href = "level-selection.html?user_name=" + encodeURIComponent(playerName);
+                }
+            }
+        });
+
+        document.getElementById('closePopup').addEventListener('click', function() {
+            document.getElementById('popup').style.display = 'none';
+        });
+
+        function retrieveAudioState() {
+            const themeSong = document.getElementById('themeSong');
+            const themeSongTime = localStorage.getItem('themeSongTime');
+            const themeSongPlaying = localStorage.getItem('themeSongPlaying') === 'true';
+
+            if (themeSongTime !== null) {
+                themeSong.currentTime = parseFloat(themeSongTime);
+            }
+            if (themeSongPlaying) {
+                themeSong.play();
+            }
+        }
+
+        window.onload = retrieveAudioState;
+    </script>
+</body>
+</html>
